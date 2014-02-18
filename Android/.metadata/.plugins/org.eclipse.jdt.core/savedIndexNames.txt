@@ -1,0 +1,8 @@
+INDEX VERSION 1.126+/Volumes/Macintosh HD/Tratamiento de Imagen/ttqr/Android/.metadata/.plugins/org.eclipse.jdt.core
+1347825609.index
+2389529916.index
+306647354.index
+2597258880.index
+289881506.index
+3964061357.index
+2701851156.index

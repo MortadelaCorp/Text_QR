@@ -1,0 +1,489 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8943F9FC18B4E03F00936374 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FB18B4E03F00936374 /* Foundation.framework */; };
+		8943F9FE18B4E03F00936374 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FD18B4E03F00936374 /* CoreGraphics.framework */; };
+		8943FA0018B4E03F00936374 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FF18B4E03F00936374 /* UIKit.framework */; };
+		8943FA0618B4E03F00936374 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA0418B4E03F00936374 /* InfoPlist.strings */; };
+		8943FA0818B4E03F00936374 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8943FA0718B4E03F00936374 /* main.m */; };
+		8943FA0C18B4E03F00936374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8943FA0B18B4E03F00936374 /* AppDelegate.m */; };
+		8943FA0F18B4E03F00936374 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA0D18B4E03F00936374 /* Main_iPhone.storyboard */; };
+		8943FA1218B4E03F00936374 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA1018B4E03F00936374 /* Main_iPad.storyboard */; };
+		8943FA1518B4E03F00936374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8943FA1418B4E03F00936374 /* ViewController.m */; };
+		8943FA1718B4E03F00936374 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA1618B4E03F00936374 /* Images.xcassets */; };
+		8943FA1E18B4E03F00936374 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943FA1D18B4E03F00936374 /* XCTest.framework */; };
+		8943FA1F18B4E03F00936374 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FB18B4E03F00936374 /* Foundation.framework */; };
+		8943FA2018B4E03F00936374 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FF18B4E03F00936374 /* UIKit.framework */; };
+		8943FA2818B4E03F00936374 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA2618B4E03F00936374 /* InfoPlist.strings */; };
+		8943FA2A18B4E03F00936374 /* TTQRTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8943FA2918B4E03F00936374 /* TTQRTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8943FA2118B4E03F00936374 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8943F9F018B4E03F00936374 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8943F9F718B4E03F00936374;
+			remoteInfo = TTQR;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		8943F9F818B4E03F00936374 /* TTQR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TTQR.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8943F9FB18B4E03F00936374 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		8943F9FD18B4E03F00936374 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		8943F9FF18B4E03F00936374 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		8943FA0318B4E03F00936374 /* TTQR-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TTQR-Info.plist"; sourceTree = "<group>"; };
+		8943FA0518B4E03F00936374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8943FA0718B4E03F00936374 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8943FA0918B4E03F00936374 /* TTQR-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TTQR-Prefix.pch"; sourceTree = "<group>"; };
+		8943FA0A18B4E03F00936374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		8943FA0B18B4E03F00936374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		8943FA0E18B4E03F00936374 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		8943FA1118B4E03F00936374 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		8943FA1318B4E03F00936374 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		8943FA1418B4E03F00936374 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		8943FA1618B4E03F00936374 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		8943FA1C18B4E03F00936374 /* TTQRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TTQRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8943FA1D18B4E03F00936374 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		8943FA2518B4E03F00936374 /* TTQRTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TTQRTests-Info.plist"; sourceTree = "<group>"; };
+		8943FA2718B4E03F00936374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8943FA2918B4E03F00936374 /* TTQRTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTQRTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8943F9F518B4E03F00936374 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943F9FE18B4E03F00936374 /* CoreGraphics.framework in Frameworks */,
+				8943FA0018B4E03F00936374 /* UIKit.framework in Frameworks */,
+				8943F9FC18B4E03F00936374 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8943FA1918B4E03F00936374 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943FA1E18B4E03F00936374 /* XCTest.framework in Frameworks */,
+				8943FA2018B4E03F00936374 /* UIKit.framework in Frameworks */,
+				8943FA1F18B4E03F00936374 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8943F9EF18B4E03F00936374 = {
+			isa = PBXGroup;
+			children = (
+				8943FA0118B4E03F00936374 /* TTQR */,
+				8943FA2318B4E03F00936374 /* TTQRTests */,
+				8943F9FA18B4E03F00936374 /* Frameworks */,
+				8943F9F918B4E03F00936374 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8943F9F918B4E03F00936374 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8943F9F818B4E03F00936374 /* TTQR.app */,
+				8943FA1C18B4E03F00936374 /* TTQRTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8943F9FA18B4E03F00936374 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8943F9FB18B4E03F00936374 /* Foundation.framework */,
+				8943F9FD18B4E03F00936374 /* CoreGraphics.framework */,
+				8943F9FF18B4E03F00936374 /* UIKit.framework */,
+				8943FA1D18B4E03F00936374 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8943FA0118B4E03F00936374 /* TTQR */ = {
+			isa = PBXGroup;
+			children = (
+				8943FA0A18B4E03F00936374 /* AppDelegate.h */,
+				8943FA0B18B4E03F00936374 /* AppDelegate.m */,
+				8943FA0D18B4E03F00936374 /* Main_iPhone.storyboard */,
+				8943FA1018B4E03F00936374 /* Main_iPad.storyboard */,
+				8943FA1318B4E03F00936374 /* ViewController.h */,
+				8943FA1418B4E03F00936374 /* ViewController.m */,
+				8943FA1618B4E03F00936374 /* Images.xcassets */,
+				8943FA0218B4E03F00936374 /* Supporting Files */,
+			);
+			path = TTQR;
+			sourceTree = "<group>";
+		};
+		8943FA0218B4E03F00936374 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8943FA0318B4E03F00936374 /* TTQR-Info.plist */,
+				8943FA0418B4E03F00936374 /* InfoPlist.strings */,
+				8943FA0718B4E03F00936374 /* main.m */,
+				8943FA0918B4E03F00936374 /* TTQR-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8943FA2318B4E03F00936374 /* TTQRTests */ = {
+			isa = PBXGroup;
+			children = (
+				8943FA2918B4E03F00936374 /* TTQRTests.m */,
+				8943FA2418B4E03F00936374 /* Supporting Files */,
+			);
+			path = TTQRTests;
+			sourceTree = "<group>";
+		};
+		8943FA2418B4E03F00936374 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8943FA2518B4E03F00936374 /* TTQRTests-Info.plist */,
+				8943FA2618B4E03F00936374 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8943F9F718B4E03F00936374 /* TTQR */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8943FA2D18B4E03F00936374 /* Build configuration list for PBXNativeTarget "TTQR" */;
+			buildPhases = (
+				8943F9F418B4E03F00936374 /* Sources */,
+				8943F9F518B4E03F00936374 /* Frameworks */,
+				8943F9F618B4E03F00936374 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TTQR;
+			productName = TTQR;
+			productReference = 8943F9F818B4E03F00936374 /* TTQR.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8943FA1B18B4E03F00936374 /* TTQRTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8943FA3018B4E03F00936374 /* Build configuration list for PBXNativeTarget "TTQRTests" */;
+			buildPhases = (
+				8943FA1818B4E03F00936374 /* Sources */,
+				8943FA1918B4E03F00936374 /* Frameworks */,
+				8943FA1A18B4E03F00936374 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8943FA2218B4E03F00936374 /* PBXTargetDependency */,
+			);
+			name = TTQRTests;
+			productName = TTQRTests;
+			productReference = 8943FA1C18B4E03F00936374 /* TTQRTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8943F9F018B4E03F00936374 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = tratamientodeimagen;
+				TargetAttributes = {
+					8943FA1B18B4E03F00936374 = {
+						TestTargetID = 8943F9F718B4E03F00936374;
+					};
+				};
+			};
+			buildConfigurationList = 8943F9F318B4E03F00936374 /* Build configuration list for PBXProject "TTQR" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8943F9EF18B4E03F00936374;
+			productRefGroup = 8943F9F918B4E03F00936374 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8943F9F718B4E03F00936374 /* TTQR */,
+				8943FA1B18B4E03F00936374 /* TTQRTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8943F9F618B4E03F00936374 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943FA1218B4E03F00936374 /* Main_iPad.storyboard in Resources */,
+				8943FA1718B4E03F00936374 /* Images.xcassets in Resources */,
+				8943FA0F18B4E03F00936374 /* Main_iPhone.storyboard in Resources */,
+				8943FA0618B4E03F00936374 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8943FA1A18B4E03F00936374 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943FA2818B4E03F00936374 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8943F9F418B4E03F00936374 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943FA1518B4E03F00936374 /* ViewController.m in Sources */,
+				8943FA0C18B4E03F00936374 /* AppDelegate.m in Sources */,
+				8943FA0818B4E03F00936374 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8943FA1818B4E03F00936374 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8943FA2A18B4E03F00936374 /* TTQRTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8943FA2218B4E03F00936374 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8943F9F718B4E03F00936374 /* TTQR */;
+			targetProxy = 8943FA2118B4E03F00936374 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		8943FA0418B4E03F00936374 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8943FA0518B4E03F00936374 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		8943FA0D18B4E03F00936374 /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8943FA0E18B4E03F00936374 /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		8943FA1018B4E03F00936374 /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8943FA1118B4E03F00936374 /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		8943FA2618B4E03F00936374 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8943FA2718B4E03F00936374 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		8943FA2B18B4E03F00936374 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8943FA2C18B4E03F00936374 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8943FA2E18B4E03F00936374 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TTQR/TTQR-Prefix.pch";
+				INFOPLIST_FILE = "TTQR/TTQR-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		8943FA2F18B4E03F00936374 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TTQR/TTQR-Prefix.pch";
+				INFOPLIST_FILE = "TTQR/TTQR-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		8943FA3118B4E03F00936374 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TTQR.app/TTQR";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TTQR/TTQR-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "TTQRTests/TTQRTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		8943FA3218B4E03F00936374 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TTQR.app/TTQR";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TTQR/TTQR-Prefix.pch";
+				INFOPLIST_FILE = "TTQRTests/TTQRTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8943F9F318B4E03F00936374 /* Build configuration list for PBXProject "TTQR" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8943FA2B18B4E03F00936374 /* Debug */,
+				8943FA2C18B4E03F00936374 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8943FA2D18B4E03F00936374 /* Build configuration list for PBXNativeTarget "TTQR" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8943FA2E18B4E03F00936374 /* Debug */,
+				8943FA2F18B4E03F00936374 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		8943FA3018B4E03F00936374 /* Build configuration list for PBXNativeTarget "TTQRTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8943FA3118B4E03F00936374 /* Debug */,
+				8943FA3218B4E03F00936374 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8943F9F018B4E03F00936374 /* Project object */;
+}

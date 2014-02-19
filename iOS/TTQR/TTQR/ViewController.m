@@ -61,6 +61,7 @@
     
     [_captureSession startRunning];
     
+    
     return YES;
 }
 

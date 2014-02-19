@@ -16,5 +16,5 @@
 @property (nonatomic, strong) AVCaptureSession *captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
 @property (nonatomic, strong) AVCaptureVideoDataOutput *videoDataOutput;
-
+ 
 @end

@@ -22,6 +22,7 @@
 		8943FA2018B4E03F00936374 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8943F9FF18B4E03F00936374 /* UIKit.framework */; };
 		8943FA2818B4E03F00936374 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8943FA2618B4E03F00936374 /* InfoPlist.strings */; };
 		8943FA2A18B4E03F00936374 /* TTQRTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8943FA2918B4E03F00936374 /* TTQRTests.m */; };
+		89C9D24418B4E7C800DE0CFB /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89C9D24318B4E7C800DE0CFB /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		8943FA2518B4E03F00936374 /* TTQRTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TTQRTests-Info.plist"; sourceTree = "<group>"; };
 		8943FA2718B4E03F00936374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8943FA2918B4E03F00936374 /* TTQRTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTQRTests.m; sourceTree = "<group>"; };
+		89C9D24318B4E7C800DE0CFB /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89C9D24418B4E7C800DE0CFB /* AVFoundation.framework in Frameworks */,
 				8943F9FE18B4E03F00936374 /* CoreGraphics.framework in Frameworks */,
 				8943FA0018B4E03F00936374 /* UIKit.framework in Frameworks */,
 				8943F9FC18B4E03F00936374 /* Foundation.framework in Frameworks */,
@@ -103,6 +106,7 @@
 		8943F9FA18B4E03F00936374 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				89C9D24318B4E7C800DE0CFB /* AVFoundation.framework */,
 				8943F9FB18B4E03F00936374 /* Foundation.framework */,
 				8943F9FD18B4E03F00936374 /* CoreGraphics.framework */,
 				8943F9FF18B4E03F00936374 /* UIKit.framework */,
@@ -474,6 +478,7 @@
 				8943FA2F18B4E03F00936374 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8943FA3018B4E03F00936374 /* Build configuration list for PBXNativeTarget "TTQRTests" */ = {
 			isa = XCConfigurationList;
@@ -482,6 +487,7 @@
 				8943FA3218B4E03F00936374 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

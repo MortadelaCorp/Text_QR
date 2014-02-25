@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="libs/BoofCV.jar"/>
+	<classpathentry kind="lib" path="libs/BoofCVAndroid.jar"/>
+	<classpathentry kind="lib" path="libs/DDogleg.jar"/>
+	<classpathentry kind="lib" path="libs/EJML.jar"/>
+	<classpathentry kind="lib" path="libs/GeoRegression.jar"/>
+	<classpathentry kind="lib" path="libs/xstream-1.4.4.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

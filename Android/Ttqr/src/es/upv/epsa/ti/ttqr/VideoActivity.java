@@ -39,7 +39,6 @@ import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.graphics.YuvImage; 
 /*import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.GImageMiscOps;

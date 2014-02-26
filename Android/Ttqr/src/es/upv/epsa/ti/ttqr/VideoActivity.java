@@ -109,7 +109,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		mCamera = selectAndOpenCamera();
 
 		Camera.Parameters param = mCamera.getParameters();
-
+		param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 		// Select the preview size closest to 320x240
 		// Smaller images are recommended because some computer vision operations are very expensive
 		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
@@ -297,6 +297,27 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	    return bmOut;
 	}
 	
+	public static Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness)
+	{
+	    ColorMatrix cm = new ColorMatrix(new float[]
+	            {
+	                contrast, 0, 0, 0, brightness,
+	                0, contrast, 0, 0, brightness,
+	                0, 0, contrast, 0, brightness,
+	                0, 0, 0, 1, 0
+	            });
+
+	    Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+
+	    Canvas canvas = new Canvas(ret);
+
+	    Paint paint = new Paint();
+	    paint.setColorFilter(new ColorMatrixColorFilter(cm));
+	    canvas.drawBitmap(bmp, 0, 0, paint);
+
+	    return ret;
+	}
+	
 	/**
 	 * Draws on top of the video stream for visualizing computer vision results
 	 */
@@ -377,7 +398,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					output = adjustedContrast(greyImage, 60);
+					output = changeBitmapContrastBrightness(greyImage, 1.5f, 0);
 				}
 				mDraw.postInvalidate();
 			}

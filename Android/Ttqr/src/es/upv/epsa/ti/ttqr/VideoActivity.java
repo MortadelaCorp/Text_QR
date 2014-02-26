@@ -48,13 +48,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Visualization mDraw;
 	private CameraPreview mPreview;
 
-	// computes the image gradient
-	//private ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class, ImageSInt16.class);
-
-	// Two images are needed to store the converted preview image to prevent a thread conflict from occurring
-	//private ImageUInt8 gray1,gray2;
-	//private ImageSInt16 derivX,derivY;
-
 	// Android image data used for displaying the results
 	private Bitmap output;
 	private Bitmap bmp;
@@ -132,10 +125,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		mCamera.setParameters(param);
 
 		// declare image data
-		//gray1 = new ImageUInt8(s.width,s.height);
-		//gray2 = new ImageUInt8(s.width,s.height);
-		//derivX = new ImageSInt16(s.width,s.height);
-		//derivY = new ImageSInt16(s.width,s.height);
 		output = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.RGB_565 );
 		bmp = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.ARGB_8888 );
 		//storage = ConvertBitmap.declareStorage(output, storage);
@@ -229,7 +218,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		// convert from NV21 format into gray scale
 		synchronized (lockGray) {
-			//ConvertNV21.nv21ToGray(bytes,gray1.width,gray1.height,gray1);
 			Camera.Parameters parameters = camera.getParameters(); 
 	        Size size = parameters.getPreviewSize(); 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -338,20 +326,11 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
-					//ImageUInt8 tmp = gray1;
-					//gray1 = gray2;
-					//gray2 = tmp;
+
 				}
-
-				//if( flipHorizontal )
-					//GImageMiscOps.flipHorizontal(gray2);
-
-				// process the image and compute its gradient
-				//gradient.process(gray2,derivX,derivY);
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					//VisualizeImageData.colorizeGradient(derivX,derivY,-1,output,storage);
 					output = toGrayscale(bmp);
 				}
 				mDraw.postInvalidate();

@@ -44,6 +44,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Bitmap output;
 	private Bitmap bmp;
 	private Bitmap greyImage;
+	private Bitmap highContrastImage;
 	// temporary storage that's needed when converting from BoofCV to Android image data types
 	private byte[] storage;
 
@@ -394,11 +395,12 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
+					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.5f, 0);
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					output = changeBitmapContrastBrightness(greyImage, 1.5f, 0);
+					output = new TextCleaner(highContrastImage).generateEdgeImage();
 				}
 				mDraw.postInvalidate();
 			}

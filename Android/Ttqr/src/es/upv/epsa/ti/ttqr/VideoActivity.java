@@ -1,6 +1,7 @@
 package es.upv.epsa.ti.ttqr;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -15,13 +16,14 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
-import android.graphics.YuvImage; 
 
 /**
  * Demonstration of how to process a video stream on an Android device using BoofCV.  Most of the code below
@@ -45,9 +47,11 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Bitmap bmp;
 	private Bitmap greyImage;
 	private Bitmap highContrastImage;
-	// temporary storage that's needed when converting from BoofCV to Android image data types
-	private byte[] storage;
-
+	private Bitmap edgeImg;
+	
+	private ArrayList<Rect> rects = new ArrayList<Rect>();
+	private Paint paint = new Paint();
+	
 	// Thread where image data is processed
 	private ThreadProcess thread;
 
@@ -55,10 +59,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private final Object lockGray = new Object();
 	// Object used for synchronizing output image
 	private final Object lockOutput = new Object();
-
-	// if true the input image is flipped horizontally
-	// Front facing cameras need to be flipped to appear correctly
-	boolean flipHorizontal;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -148,12 +148,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 			if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
 				selected = i;
-				flipHorizontal = false;
 				break;
 			} else {
 				// default to a front facing camera if a back facing one can't be found
 				selected = i;
-				flipHorizontal = true;
 			}
 		}
 
@@ -236,12 +234,12 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 	    Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
 	    Canvas c = new Canvas(bmpGrayscale);
-	    Paint paint = new Paint();
+	    Paint p = new Paint();
 	    ColorMatrix cm = new ColorMatrix();
 	    cm.setSaturation(0);
 	    ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
 	    paint.setColorFilter(f);
-	    c.drawBitmap(bmpOriginal, 0, 0, paint);
+	    c.drawBitmap(bmpOriginal, 0, 0, p);
 	    return bmpGrayscale;
 	}
 	
@@ -337,7 +335,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		@Override
 		protected void onDraw(Canvas canvas){
-
+			
 			synchronized ( lockOutput ) {
 				int w = canvas.getWidth();
 				int h = canvas.getHeight();
@@ -352,9 +350,18 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
-
+				
+				paint.setColor(Color.WHITE);
+				paint.setStrokeWidth(1);
+		        paint.setStyle(Paint.Style.STROKE);
+		        
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
+				if(rects.size() > 0) {
+					for(int i = 0; i < rects.size(); i++) {
+						canvas.drawRect(rects.get(i), paint);
+					}
+				}
 			}
 		}
 	}
@@ -396,11 +403,14 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
 					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.5f, 0);
+					edgeImg = new TextCleaner(highContrastImage).generateEdgeImage();
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					output = new TextCleaner(highContrastImage).generateEdgeImage();
+					rects = new TextRegionDetector(edgeImg).textRegion();
+					Log.i("VideoActivity", "Rects: "+rects.size());
+					output = bmp;
 				}
 				mDraw.postInvalidate();
 			}

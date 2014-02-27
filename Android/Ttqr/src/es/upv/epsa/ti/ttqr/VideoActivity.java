@@ -402,7 +402,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
-					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.5f, 0);
+					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.3f, 0);
 					edgeImg = new TextCleaner(highContrastImage).generateEdgeImage();
 				}
 

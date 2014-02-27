@@ -53,11 +53,7 @@ public class TextCleaner {
 				
 			}
 		}
-		
-		
-		
-		
-		
+
 		return edgeImg;
 		
 	}

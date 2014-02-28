@@ -12,6 +12,14 @@ public class TextRegionDetector {
 	private Bitmap edgeImg;
 	private ArrayList<Rect> textAreas = new ArrayList<Rect>();
 	
+	public TextRegionDetector() {
+
+	}
+
+	public void setEdgeImg(Bitmap edgeImg) {
+		this.edgeImg = edgeImg;
+	}
+
 	public TextRegionDetector(Bitmap bmp) {
 		
 		this.edgeImg = bmp;
@@ -19,7 +27,8 @@ public class TextRegionDetector {
 	}
 	
 	public ArrayList<Rect> textRegion() {
-
+		
+		textAreas.clear();
 		determineYCoordinate(lineHistogramY(50));
 		//determineXCoordinate(textAreas);
 
@@ -75,25 +84,28 @@ public class TextRegionDetector {
 			
 			if(lineHistogram[i] == 1 && !insideTextArea) {
 				
-				if(i-6 >= 0) {
-					y0 = i-6;
+				if(i-2 >= 0) {
+					y0 = i-2;
 				} else {
 					y0 = i;
 				}
+
 				insideTextArea = true;
 				
 			} else if(lineHistogram[i] == 0 && insideTextArea) {
 				
-				if(i+6 < edgeImg.getHeight()) {
-					y1 = i+6;
+				if(i+2 < edgeImg.getHeight()) {
+					y1 = i+2;
 				} else {
 					y1 = i - 1;
 				}
 				insideTextArea = false;
 				
+			} else if(lineHistogram[i] == 1 && insideTextArea) {
+				if(i == lineHistogram.length - 1) y1 = i;
 			}
 			
-			if(y0 > 0 && y1 > 0 && y1-y0 > 50) {
+			if(y0 > 0 && y1 > 0 && y1-y0 > 10) {
 										// left top right bottom
 				Rect textRegion = new Rect(0, y0, edgeImg.getWidth(), y1);
 				textAreas.add(textRegion);
@@ -168,7 +180,7 @@ private int[] lineHistogramX(Rect linea, int value) {
 
 			}
 			
-			if(num > 10) {
+			if(num > 20) {
 				histograma[y] = 1;
 			}
 			

@@ -9,6 +9,22 @@ public class TextCleaner {
 	private Bitmap highContrastGreyImage;
 	private int width;
 	private int height;
+	
+	public TextCleaner() {
+
+	}
+
+	public void setHighContrastGreyImage(Bitmap highContrastGreyImage) {
+		this.highContrastGreyImage = highContrastGreyImage;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
 
 	public TextCleaner(Bitmap bmp) {
 		this.highContrastGreyImage = bmp;

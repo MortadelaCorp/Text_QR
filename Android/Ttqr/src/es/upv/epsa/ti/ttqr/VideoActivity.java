@@ -53,6 +53,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Paint rect = new Paint();
 	private Paint text= new Paint();
 	
+	private TextRegionDetector TRD = new TextRegionDetector();
+	private TextCleaner TC = new TextCleaner();
+	
 	// Thread where image data is processed
 	private ThreadProcess thread;
 
@@ -115,13 +118,13 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		// Select the preview size closest to 320x240
 		// Smaller images are recommended because some computer vision operations are very expensive
 		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-		Camera.Size s = sizes.get(closest(sizes,160,120));
+		Camera.Size s = sizes.get(closest(sizes,80,60));
 		param.setPreviewSize(s.width,s.height);
 		param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
 		mCamera.setParameters(param);
 
 		// declare image data
-		output = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.RGB_565 );
+		output = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.ARGB_8888 );
 		bmp = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.ARGB_8888 );
 		//storage = ConvertBitmap.declareStorage(output, storage);
 
@@ -352,8 +355,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
-				
-				rect.setStrokeWidth(0);
+		        
+				//rect.setColor(Color.WHITE);
+				//rect.setStrokeWidth(1);
+				//rect.setStyle(Paint.Style.STROKE);
 
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
@@ -361,13 +366,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				if(rects.size() > 0) {
 					for(int i = 0; i < rects.size(); i++) {			
 				        text.setColor(Color.RED);
-				        text.setTextSize(rects.get(i).top - rects.get(i).bottom);
+				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
 						
-				        canvas.drawRect(rects.get(i), rect);	
-						
-				        rect.setColor(bmp.getPixel(0, 
-								(rects.get(i).top + rects.get(i).bottom) / 2));
-				        
+				        //canvas.drawRect(rects.get(i), rect);	
 						canvas.drawText("Traducción", rects.get(i).left + bmp.getWidth() / 10, 
 								(rects.get(i).top + rects.get(i).bottom) / 2, 
 								text);
@@ -414,13 +415,17 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
 					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.7f, -50);
-					edgeImg = new TextCleaner(highContrastImage).generateEdgeImage();
+					TC.setHighContrastGreyImage(highContrastImage);
+					TC.setHeight(highContrastImage.getHeight());
+					TC.setWidth(highContrastImage.getWidth());
+					edgeImg = TC.generateEdgeImage();
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					rects = new TextRegionDetector(edgeImg).textRegion();
-					//Log.i("VideoActivity", "Rects: "+rects.size());
+					TRD.setEdgeImg(edgeImg);
+					rects = TRD.textRegion();
+
 					output = bmp;
 				}
 				mDraw.postInvalidate();

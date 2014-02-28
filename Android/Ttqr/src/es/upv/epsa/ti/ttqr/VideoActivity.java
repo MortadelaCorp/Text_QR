@@ -50,7 +50,8 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Bitmap edgeImg;
 	
 	private ArrayList<Rect> rects = new ArrayList<Rect>();
-	private Paint paint = new Paint();
+	private Paint rect = new Paint();
+	private Paint text= new Paint();
 	
 	// Thread where image data is processed
 	private ThreadProcess thread;
@@ -114,8 +115,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		// Select the preview size closest to 320x240
 		// Smaller images are recommended because some computer vision operations are very expensive
 		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-		Camera.Size s = sizes.get(closest(sizes,320,240));
+		Camera.Size s = sizes.get(closest(sizes,160,120));
 		param.setPreviewSize(s.width,s.height);
+		param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
 		mCamera.setParameters(param);
 
 		// declare image data
@@ -238,7 +240,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	    ColorMatrix cm = new ColorMatrix();
 	    cm.setSaturation(0);
 	    ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-	    paint.setColorFilter(f);
+	    p.setColorFilter(f);
 	    c.drawBitmap(bmpOriginal, 0, 0, p);
 	    return bmpGrayscale;
 	}
@@ -310,9 +312,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 	    Canvas canvas = new Canvas(ret);
 
-	    Paint paint = new Paint();
-	    paint.setColorFilter(new ColorMatrixColorFilter(cm));
-	    canvas.drawBitmap(bmp, 0, 0, paint);
+	    Paint pt = new Paint();
+	    pt.setColorFilter(new ColorMatrixColorFilter(cm));
+	    canvas.drawBitmap(bmp, 0, 0, pt);
 
 	    return ret;
 	}
@@ -351,15 +353,24 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
 				
-				paint.setColor(Color.WHITE);
-				paint.setStrokeWidth(1);
-		        paint.setStyle(Paint.Style.STROKE);
-		        
+				rect.setStrokeWidth(0);
+
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
+				
 				if(rects.size() > 0) {
-					for(int i = 0; i < rects.size(); i++) {
-						canvas.drawRect(rects.get(i), paint);
+					for(int i = 0; i < rects.size(); i++) {			
+				        text.setColor(Color.RED);
+				        text.setTextSize(rects.get(i).top - rects.get(i).bottom);
+						
+				        canvas.drawRect(rects.get(i), rect);	
+						
+				        rect.setColor(bmp.getPixel(0, 
+								(rects.get(i).top + rects.get(i).bottom) / 2));
+				        
+						canvas.drawText("Traducción", rects.get(i).left + bmp.getWidth() / 10, 
+								(rects.get(i).top + rects.get(i).bottom) / 2, 
+								text);
 					}
 				}
 			}
@@ -402,14 +413,14 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
-					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.3f, 0);
+					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.7f, -50);
 					edgeImg = new TextCleaner(highContrastImage).generateEdgeImage();
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
 					rects = new TextRegionDetector(edgeImg).textRegion();
-					Log.i("VideoActivity", "Rects: "+rects.size());
+					//Log.i("VideoActivity", "Rects: "+rects.size());
 					output = bmp;
 				}
 				mDraw.postInvalidate();

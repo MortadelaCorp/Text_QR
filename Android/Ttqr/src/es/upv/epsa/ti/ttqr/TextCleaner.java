@@ -30,23 +30,27 @@ public class TextCleaner {
 				
 				if(0 < x && x < width-1 && 0 < y && y < height) {
 
-					int pixel = Color.red(highContrastGreyImage.getPixel(x, y));
-					int pixelLeft = Color.red(highContrastGreyImage.getPixel(x - 1, y));
+					int pixel = Color.blue(highContrastGreyImage.getPixel(x, y));
+					int pixelLeft = Color.blue(highContrastGreyImage.getPixel(x - 1, y));
 					left = pixel - pixelLeft;
 					
-					int pixelUp = Color.red(highContrastGreyImage.getPixel(x, y - 1));
+					int pixelUp = Color.blue(highContrastGreyImage.getPixel(x, y - 1));
 					upper = pixel - pixelUp;
 					
-					int pixelRU = Color.red(highContrastGreyImage.getPixel(x + 1, y - 1));
+					int pixelRU = Color.blue(highContrastGreyImage.getPixel(x + 1, y - 1));
 					rightUpper = pixel - pixelRU;
 					
 					int pixelMax = Math.max(left, Math.max(upper, rightUpper));
-
-					edgeImg.setPixel(x, y, Color.rgb(pixelMax, pixelMax, pixelMax));
+					
+					if(pixelMax < 50) { 
+						edgeImg.setPixel(x, y, Color.rgb(0, 0, 0));
+					} else {
+						edgeImg.setPixel(x, y, Color.rgb(pixelMax, pixelMax, pixelMax));
+					}
 
 				} else {
 					
-					edgeImg.setPixel(x, y, 0);
+					edgeImg.setPixel(x, y, Color.rgb(0, 0, 0));
 					
 				}
 

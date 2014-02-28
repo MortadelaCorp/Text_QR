@@ -10,8 +10,7 @@ import android.util.Log;
 public class TextRegionDetector {
 
 	private Bitmap edgeImg;
-	private ArrayList<Rect> textArea = new ArrayList<Rect>();
-	private ArrayList<Rect> returnAreas = new ArrayList<Rect>();
+	private ArrayList<Rect> textAreas = new ArrayList<Rect>();
 	
 	public TextRegionDetector(Bitmap bmp) {
 		
@@ -21,10 +20,10 @@ public class TextRegionDetector {
 	
 	public ArrayList<Rect> textRegion() {
 
-		determineYCoordinate(lineHistogramY(20));
-		determineXCoordinate(textArea);
+		determineYCoordinate(lineHistogramY(50));
+		//determineXCoordinate(textAreas);
 
-		return returnAreas;
+		return textAreas;
 	}
 	
 	private void determineXCoordinate(ArrayList<Rect> lineas) {
@@ -35,7 +34,7 @@ public class TextRegionDetector {
 		
 		for(int i = 0; i < lineas.size(); i++) {
 
-			int[] lineHistogram = lineHistogramX(lineas.get(i), 20);
+			int[] lineHistogram = lineHistogramX(lineas.get(i), 50);
 			
 			for(int j = 0; j < lineHistogram.length; j++) {
 				
@@ -51,10 +50,10 @@ public class TextRegionDetector {
 					
 				}
 				
-				if(x0 > 0 && x1 > 0) {
+				if(x0 > 0 && x1 > 0 && x1-x0 > 15) {
 											// left top right bottom
 					Rect textRegion = new Rect(x0, lineas.get(i).top, x1, lineas.get(i).bottom);
-					returnAreas.add(textRegion);
+					textAreas.add(textRegion);
 					
 					x0 = 0;
 					x1 = 0;
@@ -75,21 +74,29 @@ public class TextRegionDetector {
 		for(int i = 0; i < lineHistogram.length; i++) {
 			
 			if(lineHistogram[i] == 1 && !insideTextArea) {
-								
-				y0 = i;
+				
+				if(i-6 >= 0) {
+					y0 = i-6;
+				} else {
+					y0 = i;
+				}
 				insideTextArea = true;
 				
 			} else if(lineHistogram[i] == 0 && insideTextArea) {
 				
-				y1 = i - 1;
+				if(i+6 < edgeImg.getHeight()) {
+					y1 = i+6;
+				} else {
+					y1 = i - 1;
+				}
 				insideTextArea = false;
 				
 			}
 			
-			if(y0 > 0 && y1 > 0) {
+			if(y0 > 0 && y1 > 0 && y1-y0 > 50) {
 										// left top right bottom
 				Rect textRegion = new Rect(0, y0, edgeImg.getWidth(), y1);
-				textArea.add(textRegion);
+				textAreas.add(textRegion);
 				
 				y0 = 0;
 				y1 = 0;

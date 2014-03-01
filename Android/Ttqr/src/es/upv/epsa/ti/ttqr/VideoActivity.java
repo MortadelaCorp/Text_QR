@@ -118,9 +118,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		// Select the preview size closest to 320x240
 		// Smaller images are recommended because some computer vision operations are very expensive
 		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-		Camera.Size s = sizes.get(closest(sizes,80,60));
+		Camera.Size s = sizes.get(closest(sizes,176,144));
 		param.setPreviewSize(s.width,s.height);
-		param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
+		//param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
 		mCamera.setParameters(param);
 
 		// declare image data
@@ -357,7 +357,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				canvas.scale((float)scale,(float)scale);
 		        
 				//rect.setColor(Color.WHITE);
-				//rect.setStrokeWidth(1);
+				//rect.setStrokeWidth(0);
 				//rect.setStyle(Paint.Style.STROKE);
 
 				// draw the image
@@ -365,11 +365,14 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				
 				if(rects.size() > 0) {
 					for(int i = 0; i < rects.size(); i++) {			
-				        text.setColor(Color.RED);
-				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
-						
+				        //text.setColor(bmp.getPixel(rects.get(i).left + 10, 
+				        //		(rects.get(i).bottom + rects.get(i).top) / 2));
+						text.setColor(Color.RED);
+				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 80 / 100);
+
+				        //rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
 				        //canvas.drawRect(rects.get(i), rect);	
-						canvas.drawText("Traducción", rects.get(i).left + bmp.getWidth() / 10, 
+						canvas.drawText("Texto!", rects.get(i).left + bmp.getWidth() / 10, 
 								(rects.get(i).top + rects.get(i).bottom) / 2, 
 								text);
 					}
@@ -414,15 +417,17 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
 					greyImage = toGrayscale(bmp);
-					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.7f, -50);
-					TC.setHighContrastGreyImage(highContrastImage);
-					TC.setHeight(highContrastImage.getHeight());
-					TC.setWidth(highContrastImage.getWidth());
-					edgeImg = TC.generateEdgeImage();
+					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.6f, 0);
+					
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
+					TC.setHighContrastGreyImage(highContrastImage);
+					TC.setHeight(highContrastImage.getHeight());
+					TC.setWidth(highContrastImage.getWidth());
+					edgeImg = TC.generateEdgeImage();
+					
 					TRD.setEdgeImg(edgeImg);
 					rects = TRD.textRegion();
 

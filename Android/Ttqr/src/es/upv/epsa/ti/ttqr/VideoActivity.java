@@ -20,7 +20,6 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -45,7 +44,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	// Android image data used for displaying the results
 	private Bitmap output;
 	private Bitmap bmp;
-	private Bitmap greyImage;
 	private Bitmap highContrastImage;
 	private Bitmap edgeImg;
 	
@@ -248,59 +246,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	    return bmpGrayscale;
 	}
 	
-	private Bitmap adjustedContrast(Bitmap src, double value)
-	{
-	    // image size
-	    int width = src.getWidth();
-	    int height = src.getHeight();
-	    // create output bitmap
-
-	    // create a mutable empty bitmap
-	    Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
-
-	    // create a canvas so that we can draw the bmOut Bitmap from source bitmap
-	    Canvas c = new Canvas();
-	    c.setBitmap(bmOut);
-
-	    // draw bitmap to bmOut from src bitmap so we can modify it
-	    c.drawBitmap(src, 0, 0, new Paint(Color.BLACK));
-
-
-	    // color information
-	    int A, R, G, B;
-	    int pixel;
-	    // get contrast value
-	    double contrast = Math.pow((100 + value) / 100, 2);
-
-	    // scan through all pixels
-	    for(int x = 0; x < width; ++x) {
-	        for(int y = 0; y < height; ++y) {
-	            // get pixel color
-	            pixel = src.getPixel(x, y);
-	            A = Color.alpha(pixel);
-	            // apply filter contrast for every channel R, G, B
-	            R = Color.red(pixel);
-	            R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-	            if(R < 0) { R = 0; }
-	            else if(R > 255) { R = 255; }
-
-	            /*G = Color.green(pixel);
-	            G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-	            if(G < 0) { G = 0; }
-	            else if(G > 255) { G = 255; }
-
-	            B = Color.blue(pixel);
-	            B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-	            if(B < 0) { B = 0; }
-	            else if(B > 255) { B = 255; }*/
-		
-	            // set new pixel color to output bitmap
-	            bmOut.setPixel(x, y, Color.argb(A, R, R, R));
-	        }
-	    }
-	    return bmOut;
-	}
-	
 	public static Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness)
 	{
 	    ColorMatrix cm = new ColorMatrix(new float[]
@@ -368,10 +313,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				        //text.setColor(bmp.getPixel(rects.get(i).left + 10, 
 				        //		(rects.get(i).bottom + rects.get(i).top) / 2));
 						text.setColor(Color.RED);
-				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 80 / 100);
+				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
 
-				        //rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
-				        //canvas.drawRect(rects.get(i), rect);	
+				        rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
+				        canvas.drawRect(rects.get(i), rect);	
 						canvas.drawText("Texto!", rects.get(i).left + bmp.getWidth() / 10, 
 								(rects.get(i).top + rects.get(i).bottom) / 2, 
 								text);
@@ -416,23 +361,16 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
-					greyImage = toGrayscale(bmp);
-					highContrastImage = changeBitmapContrastBrightness(greyImage, 1.6f, 0);
-					
+					highContrastImage = changeBitmapContrastBrightness(toGrayscale(bmp), 1.5f, 0);	
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					TC.setHighContrastGreyImage(highContrastImage);
-					TC.setHeight(highContrastImage.getHeight());
-					TC.setWidth(highContrastImage.getWidth());
-					edgeImg = TC.generateEdgeImage();
-					
-					TRD.setEdgeImg(edgeImg);
-					rects = TRD.textRegion();
-
+					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
+					rects = TRD.textRegion(edgeImg);
 					output = bmp;
 				}
+				
 				mDraw.postInvalidate();
 			}
 			running = false;

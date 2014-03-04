@@ -42,8 +42,8 @@ public class TextRegionDetector {
 					if(lineHistogram[l] == 1) {
 						num1++;
 						if(num1 > lineHistogram.length * 10 / 100) {
-							if(l - lineHistogram.length * 10 / 100 - 5 > lineas.get(i).left)
-								x0 = l - lineHistogram.length * 10 / 100 - 5;
+							if(l - lineHistogram.length * 10 / 100 - 2 > lineas.get(i).left)
+								x0 = l - lineHistogram.length * 10 / 100 - 2;
 							else x0 = lineas.get(i).left;
 							num1 = 0;
 							num0 = 0;
@@ -62,8 +62,8 @@ public class TextRegionDetector {
 					if(lineHistogram[l] == 1) {
 						num1++;
 						if(num1 > lineHistogram.length * 10 / 100) {
-							if(l + lineHistogram.length * 10 / 100 + 5 < lineas.get(i).right)
-								x1 = l + lineHistogram.length * 10 / 100 + 5;
+							if(l + lineHistogram.length * 10 / 100 + 2 < lineas.get(i).right)
+								x1 = l + lineHistogram.length * 10 / 100 + 2;
 							else x1 = lineas.get(i).right;
 							num1 = 0;
 							num0 = 0;
@@ -101,8 +101,8 @@ public class TextRegionDetector {
 			
 			if(lineHistogram[i] == 1 && !insideTextArea) {
 				
-				if(i-5 >= 0) {
-					y0 = i-5;
+				if(i-3 >= 0) {
+					y0 = i-3;
 				} else {
 					y0 = i;
 				}
@@ -111,8 +111,8 @@ public class TextRegionDetector {
 				
 			} else if(lineHistogram[i] == 0 && insideTextArea) {
 				
-				if(i+5 < edgeImg.getHeight()) {
-					y1 = i+5;
+				if(i+3 < edgeImg.getHeight()) {
+					y1 = i+3;
 				} else {
 					y1 = i;
 				}

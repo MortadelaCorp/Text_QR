@@ -53,6 +53,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	
 	private TextRegionDetector TRD = new TextRegionDetector();
 	private TextCleaner TC = new TextCleaner();
+	private ImageToBlackWhite ITBW = new ImageToBlackWhite();
 	
 	// Thread where image data is processed
 	private ThreadProcess thread;
@@ -185,7 +186,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	/**
 	 * Goes through the size list and selects the one which is the closest specified size
 	 */
-	public static int closest( List<Camera.Size> sizes , int width , int height ) {
+	private int closest( List<Camera.Size> sizes , int width , int height ) {
 		int best = -1;
 		int bestScore = Integer.MAX_VALUE;
 
@@ -211,7 +212,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	@Override
 	public void onPreviewFrame(byte[] bytes, Camera camera) {
 
-		// convert from NV21 format into gray scale
+		// convert from NV21 format into Bitmap
 		synchronized (lockGray) {
 			Camera.Parameters parameters = camera.getParameters(); 
 	        Size size = parameters.getPreviewSize(); 
@@ -228,45 +229,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		// tells the thread to wake up and process another image
 		thread.interrupt();
 	}
-	
-	public Bitmap toGrayscale(Bitmap bmpOriginal)
-	{        
-	    int width, height;
-	    height = bmpOriginal.getHeight();
-	    width = bmpOriginal.getWidth();
 
-	    Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-	    Canvas c = new Canvas(bmpGrayscale);
-	    Paint p = new Paint();
-	    ColorMatrix cm = new ColorMatrix();
-	    cm.setSaturation(0);
-	    ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-	    p.setColorFilter(f);
-	    c.drawBitmap(bmpOriginal, 0, 0, p);
-	    return bmpGrayscale;
-	}
-	
-	public static Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness)
-	{
-	    ColorMatrix cm = new ColorMatrix(new float[]
-	            {
-	                contrast, 0, 0, 0, brightness,
-	                0, contrast, 0, 0, brightness,
-	                0, 0, contrast, 0, brightness,
-	                0, 0, 0, 1, 0
-	            });
-
-	    Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
-
-	    Canvas canvas = new Canvas(ret);
-
-	    Paint pt = new Paint();
-	    pt.setColorFilter(new ColorMatrixColorFilter(cm));
-	    canvas.drawBitmap(bmp, 0, 0, pt);
-
-	    return ret;
-	}
-	
 	/**
 	 * Draws on top of the video stream for visualizing computer vision results
 	 */
@@ -301,9 +264,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
 		        
-				//rect.setColor(Color.WHITE);
-				//rect.setStrokeWidth(0);
-				//rect.setStyle(Paint.Style.STROKE);
+				rect.setColor(Color.WHITE);
+				rect.setStrokeWidth(0);
+				rect.setStyle(Paint.Style.STROKE);
 
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
@@ -312,14 +275,14 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 					for(int i = 0; i < rects.size(); i++) {			
 				        //text.setColor(bmp.getPixel(rects.get(i).left + 10, 
 				        //		(rects.get(i).bottom + rects.get(i).top) / 2));
-						text.setColor(Color.RED);
-				        text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
+						//text.setColor(Color.RED);
+				        //text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
 
-				        rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
+				        //rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
 				        canvas.drawRect(rects.get(i), rect);	
-						canvas.drawText("Texto!", rects.get(i).left + bmp.getWidth() / 10, 
-								(rects.get(i).top + rects.get(i).bottom) / 2, 
-								text);
+						//canvas.drawText("Texto!", rects.get(i).left + bmp.getWidth() / 10, 
+						//		(rects.get(i).top + rects.get(i).bottom) / 2, 
+						//		text);
 					}
 				}
 			}
@@ -361,12 +324,12 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
-					highContrastImage = changeBitmapContrastBrightness(toGrayscale(bmp), 1.5f, 0);	
+					highContrastImage = ITBW.changeBitmapContrastBrightness(bmp, 1.4f, 0);
+					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
 				}
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
 					rects = TRD.textRegion(edgeImg);
 					output = bmp;
 				}

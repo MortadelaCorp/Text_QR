@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
         android:layout_below="@+id/textView1"
-        android:layout_marginTop="89dp"
         android:text="@string/bt_main_text" />
 
     <Button
@@ -34,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/bt_main_texto"
         android:layout_below="@+id/bt_main_texto"
-        android:layout_marginTop="60dp"
-        android:text="@string/bt_main_qr" />
+        android:text="@string/bt_main_qr"
+        android:visibility="invisible" />
 
 </RelativeLayout>

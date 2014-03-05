@@ -19,6 +19,7 @@
 		89AF540118BE66B600E1256A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AF53E918BE66B600E1256A /* UIKit.framework */; };
 		89AF540918BE66B600E1256A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 89AF540718BE66B600E1256A /* InfoPlist.strings */; };
 		89AF540B18BE66B600E1256A /* ocrqrTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 89AF540A18BE66B600E1256A /* ocrqrTests.m */; };
+		89AF541518BE66CF00E1256A /* TesseractOCR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AF541418BE66CF00E1256A /* TesseractOCR.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		89AF540618BE66B600E1256A /* ocrqrTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ocrqrTests-Info.plist"; sourceTree = "<group>"; };
 		89AF540818BE66B600E1256A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		89AF540A18BE66B600E1256A /* ocrqrTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ocrqrTests.m; sourceTree = "<group>"; };
+		89AF541418BE66CF00E1256A /* TesseractOCR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TesseractOCR.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89AF541518BE66CF00E1256A /* TesseractOCR.framework in Frameworks */,
 				89AF53E818BE66B600E1256A /* CoreGraphics.framework in Frameworks */,
 				89AF53EA18BE66B600E1256A /* UIKit.framework in Frameworks */,
 				89AF53E618BE66B600E1256A /* Foundation.framework in Frameworks */,
@@ -96,6 +99,7 @@
 		89AF53E418BE66B600E1256A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				89AF541418BE66CF00E1256A /* TesseractOCR.framework */,
 				89AF53E518BE66B600E1256A /* Foundation.framework */,
 				89AF53E718BE66B600E1256A /* CoreGraphics.framework */,
 				89AF53E918BE66B600E1256A /* UIKit.framework */,
@@ -361,6 +365,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/ipruch/Xcode\\ Projects\\ /EPSA/ttqr/iOS/ocrqr",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ocrqr/ocrqr-Prefix.pch";
 				INFOPLIST_FILE = "ocrqr/ocrqr-Info.plist";
@@ -374,6 +382,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/ipruch/Xcode\\ Projects\\ /EPSA/ttqr/iOS/ocrqr",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ocrqr/ocrqr-Prefix.pch";
 				INFOPLIST_FILE = "ocrqr/ocrqr-Info.plist";

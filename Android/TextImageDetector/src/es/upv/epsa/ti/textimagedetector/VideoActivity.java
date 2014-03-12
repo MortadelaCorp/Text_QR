@@ -196,7 +196,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 					} catch (InterruptedException ignored) {}
 				}
 
-				// process the most recently converted image by swapping image buffered
+				// convert to edgeImg
 				synchronized (lockGray) {
 					t1 = System.currentTimeMillis();
 					highContrastImage = ITBW.changeBitmapContrastBrightness(bmp, 1.4f, 0);

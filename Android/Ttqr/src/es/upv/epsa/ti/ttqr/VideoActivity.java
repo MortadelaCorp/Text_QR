@@ -12,8 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -264,10 +262,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
 		        
-				rect.setColor(Color.WHITE);
+				rect.setColor(Color.argb(25, 255, 0, 0));
 				rect.setStrokeWidth(0);
-				rect.setStyle(Paint.Style.STROKE);
-
+				//rect.setStyle(Paint.Style.STROKE);
+				
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
 				
@@ -312,7 +310,8 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		@Override
 		public void run() {
-
+			long t1, t2;
+			
 			while( !stopRequested ) {
 
 				// Sleep until it has been told to wake up
@@ -324,6 +323,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
+					t1 = System.currentTimeMillis();
 					highContrastImage = ITBW.changeBitmapContrastBrightness(bmp, 1.4f, 0);
 					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
 				}
@@ -332,6 +332,8 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				synchronized ( lockOutput ) {
 					rects = TRD.textRegion(edgeImg);
 					output = bmp;
+					t2 = System.currentTimeMillis();
+					System.out.println("Time edgeImg: " + (t2-t1));
 				}
 				
 				mDraw.postInvalidate();

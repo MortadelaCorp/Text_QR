@@ -128,7 +128,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 					canvas.translate((float)tranX,(float)tranY);
 					canvas.scale((float)scale,(float)scale);
 					//if(edgeImg != null) canvas.drawBitmap(edgeImg, 0, 0, null);
-					rect.setColor(Color.argb(25, 255, 0, 0));
+					rect.setColor(Color.argb(50, 255, 0, 0));
 					rect.setStrokeWidth(0);
 					if(rects.size() > 0) {
 						for(int i = 0; i < rects.size(); i++) {	

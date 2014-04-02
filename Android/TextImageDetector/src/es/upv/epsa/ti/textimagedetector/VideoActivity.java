@@ -2,6 +2,7 @@ package es.upv.epsa.ti.textimagedetector;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import es.upv.epsa.ti.textimagedetector.ImageToBlackWhite;
 import es.upv.epsa.ti.textimagedetector.TextCleaner;
@@ -30,21 +31,21 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private TextCleaner TC = new TextCleaner();
 	private ImageToBlackWhite ITBW = new ImageToBlackWhite();
     
-	private int scaleFactor = 10;
+	private static final int SCALE_FACTOR = 10;
 	// Android image data used for displaying the results
 	private Bitmap bmp;
 	private Bitmap auxBmp;
 	private Bitmap highContrastImage;
 	private Bitmap edgeImg;
 	
-	private ArrayList<Rect> rects = new ArrayList<Rect>();
-	private Paint rect = new Paint();
+	private List<Rect> rects = new ArrayList<Rect>();
+	private Paint rectPaint = new Paint();
 		
     // Thread where image data is processed
  	private ThreadProcess thread;
  	
     // Object used for synchronizing gray images
- 	private final Object lockGray = new Object();
+ 	private final Object lockEdge = new Object();
  	// Object used for synchronizing output image
  	private final Object lockOutput = new Object();
 
@@ -127,12 +128,15 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		
 					canvas.translate((float)tranX,(float)tranY);
 					canvas.scale((float)scale,(float)scale);
-					//if(edgeImg != null) canvas.drawBitmap(edgeImg, 0, 0, null);
-					rect.setColor(Color.argb(50, 255, 0, 0));
-					rect.setStrokeWidth(0);
+					rectPaint.setColor(Color.argb(100, 255, 0, 0));
+					rectPaint.setStrokeWidth(0);
 					if(rects.size() > 0) {
 						for(int i = 0; i < rects.size(); i++) {	
-							canvas.drawRect(rects.get(i).left * scaleFactor, rects.get(i).top * scaleFactor, rects.get(i).right * scaleFactor, rects.get(i).bottom * scaleFactor, rect);	
+							canvas.drawRect(rects.get(i).left * SCALE_FACTOR, 
+									rects.get(i).top * SCALE_FACTOR, 
+									rects.get(i).right * SCALE_FACTOR, 
+									rects.get(i).bottom * SCALE_FACTOR, 
+									rectPaint);	
 						}
 					}
 				}
@@ -144,7 +148,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	public void onPreviewFrame(byte[] data, Camera camera) {		
 		
 		// convert from NV21 format into Bitmap
-		synchronized (lockGray) {
+		synchronized (lockEdge) {
 			Camera.Parameters parameters = camera.getParameters(); 
 	        Size size = parameters.getPreviewSize(); 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -153,8 +157,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 			byte[] imageBytes = out.toByteArray();
 			
 			auxBmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-			bmp = Bitmap.createScaledBitmap(auxBmp, size.width / scaleFactor, size.height / scaleFactor, false);
-
+			bmp = Bitmap.createScaledBitmap(auxBmp, size.width / SCALE_FACTOR, size.height / SCALE_FACTOR, false);
 		}
 		// Can only do trivial amounts of image processing inside this function or else bad stuff happens.
 		// To work around this issue most of the processing has been pushed onto a thread and the call below
@@ -185,8 +188,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		@Override
 		public void run() {
-			long t1, t2;
-			
 			while( !stopRequested ) {
 
 				// Sleep until it has been told to wake up
@@ -197,8 +198,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				}
 
 				// convert to edgeImg
-				synchronized (lockGray) {
-					t1 = System.currentTimeMillis();
+				synchronized (lockEdge) {
 					highContrastImage = ITBW.changeBitmapContrastBrightness(bmp, 1.4f, 0);
 					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
 				}
@@ -206,8 +206,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
 					rects = TRD.textRegion(edgeImg);
-					t2 = System.currentTimeMillis();
-					System.out.println("Time: " + (t2-t1));
 				}
 				
 				mDraw.postInvalidate();

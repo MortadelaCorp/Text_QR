@@ -6,7 +6,24 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 
-public class ImageToBlackWhite {
+public class ImageToBlackWhite {	
+	public Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness) {	
+	    ColorMatrix cm = new ColorMatrix(new float[]
+	            {
+	                contrast, 0, 0, 0, brightness,
+	                0, contrast, 0, 0, brightness,
+	                0, 0, contrast, 0, brightness,
+	                0, 0, 0, 1, 0
+	            });
+
+	    Bitmap highContrastBmp = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());	    
+	    Canvas canvas = new Canvas(highContrastBmp);
+	    Paint pt = new Paint();
+	    pt.setColorFilter(new ColorMatrixColorFilter(cm));
+	    canvas.drawBitmap(toGrayscale(bmp), 0, 0, pt);
+
+	    return highContrastBmp;
+	}
 	
 	private static Bitmap toGrayscale(Bitmap bmpOriginal)
 	{        
@@ -25,27 +42,4 @@ public class ImageToBlackWhite {
 	    
 	    return bmpGrayscale;
 	}
-	
-	public Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness)
-	{
-		
-	    ColorMatrix cm = new ColorMatrix(new float[]
-	            {
-	                contrast, 0, 0, 0, brightness,
-	                0, contrast, 0, 0, brightness,
-	                0, 0, contrast, 0, brightness,
-	                0, 0, 0, 1, 0
-	            });
-
-	    Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
-	    
-	    Canvas canvas = new Canvas(ret);
-
-	    Paint pt = new Paint();
-	    pt.setColorFilter(new ColorMatrixColorFilter(cm));
-	    canvas.drawBitmap(toGrayscale(bmp), 0, 0, pt);
-
-	    return ret;
-	}
-	
 }

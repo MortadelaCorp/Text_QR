@@ -31,7 +31,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private TextCleaner TC = new TextCleaner();
 	private ImageToBlackWhite ITBW = new ImageToBlackWhite();
     
-	private static final int SCALE_FACTOR = 10;
+	private static final int SCALE_FACTOR = 5;
 	// Android image data used for displaying the results
 	private Bitmap bmp;
 	private Bitmap auxBmp;

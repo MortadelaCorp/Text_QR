@@ -1,6 +1,7 @@
 package es.upv.epsa.ti.ttqr;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -10,26 +11,16 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
-import android.graphics.YuvImage; 
-/*import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.ConvertNV21;
-import boofcv.android.VisualizeImageData;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
-*/
 
 /**
  * Demonstration of how to process a video stream on an Android device using BoofCV.  Most of the code below
@@ -48,19 +39,20 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private Visualization mDraw;
 	private CameraPreview mPreview;
 
-	// computes the image gradient
-	//private ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class, ImageSInt16.class);
-
-	// Two images are needed to store the converted preview image to prevent a thread conflict from occurring
-	//private ImageUInt8 gray1,gray2;
-	//private ImageSInt16 derivX,derivY;
-
 	// Android image data used for displaying the results
 	private Bitmap output;
 	private Bitmap bmp;
-	// temporary storage that's needed when converting from BoofCV to Android image data types
-	private byte[] storage;
-
+	private Bitmap highContrastImage;
+	private Bitmap edgeImg;
+	
+	private ArrayList<Rect> rects = new ArrayList<Rect>();
+	private Paint rect = new Paint();
+	private Paint text= new Paint();
+	
+	private TextRegionDetector TRD = new TextRegionDetector();
+	private TextCleaner TC = new TextCleaner();
+	private ImageToBlackWhite ITBW = new ImageToBlackWhite();
+	
 	// Thread where image data is processed
 	private ThreadProcess thread;
 
@@ -68,10 +60,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private final Object lockGray = new Object();
 	// Object used for synchronizing output image
 	private final Object lockOutput = new Object();
-
-	// if true the input image is flipped horizontally
-	// Front facing cameras need to be flipped to appear correctly
-	boolean flipHorizontal;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -123,20 +111,17 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		mCamera = selectAndOpenCamera();
 
 		Camera.Parameters param = mCamera.getParameters();
-
+		param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 		// Select the preview size closest to 320x240
 		// Smaller images are recommended because some computer vision operations are very expensive
 		List<Camera.Size> sizes = param.getSupportedPreviewSizes();
-		Camera.Size s = sizes.get(closest(sizes,320,240));
+		Camera.Size s = sizes.get(closest(sizes,176,144));
 		param.setPreviewSize(s.width,s.height);
+		//param.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH); 
 		mCamera.setParameters(param);
 
 		// declare image data
-		//gray1 = new ImageUInt8(s.width,s.height);
-		//gray2 = new ImageUInt8(s.width,s.height);
-		//derivX = new ImageSInt16(s.width,s.height);
-		//derivY = new ImageSInt16(s.width,s.height);
-		output = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.RGB_565 );
+		output = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.ARGB_8888 );
 		bmp = Bitmap.createBitmap(s.width,s.height,Bitmap.Config.ARGB_8888 );
 		//storage = ConvertBitmap.declareStorage(output, storage);
 
@@ -165,12 +150,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 			if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
 				selected = i;
-				flipHorizontal = false;
 				break;
 			} else {
 				// default to a front facing camera if a back facing one can't be found
 				selected = i;
-				flipHorizontal = true;
 			}
 		}
 
@@ -201,7 +184,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	/**
 	 * Goes through the size list and selects the one which is the closest specified size
 	 */
-	public static int closest( List<Camera.Size> sizes , int width , int height ) {
+	private int closest( List<Camera.Size> sizes , int width , int height ) {
 		int best = -1;
 		int bestScore = Integer.MAX_VALUE;
 
@@ -227,9 +210,8 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	@Override
 	public void onPreviewFrame(byte[] bytes, Camera camera) {
 
-		// convert from NV21 format into gray scale
+		// convert from NV21 format into Bitmap
 		synchronized (lockGray) {
-			//ConvertNV21.nv21ToGray(bytes,gray1.width,gray1.height,gray1);
 			Camera.Parameters parameters = camera.getParameters(); 
 	        Size size = parameters.getPreviewSize(); 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -245,24 +227,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		// tells the thread to wake up and process another image
 		thread.interrupt();
 	}
-	
-	public Bitmap toGrayscale(Bitmap bmpOriginal)
-	{        
-	    int width, height;
-	    height = bmpOriginal.getHeight();
-	    width = bmpOriginal.getWidth();
 
-	    Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-	    Canvas c = new Canvas(bmpGrayscale);
-	    Paint paint = new Paint();
-	    ColorMatrix cm = new ColorMatrix();
-	    cm.setSaturation(0);
-	    ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-	    paint.setColorFilter(f);
-	    c.drawBitmap(bmpOriginal, 0, 0, paint);
-	    return bmpGrayscale;
-	}
-	
 	/**
 	 * Draws on top of the video stream for visualizing computer vision results
 	 */
@@ -281,7 +246,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		@Override
 		protected void onDraw(Canvas canvas){
-
+			
 			synchronized ( lockOutput ) {
 				int w = canvas.getWidth();
 				int h = canvas.getHeight();
@@ -296,9 +261,28 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				canvas.translate((float)tranX,(float)tranY);
 				canvas.scale((float)scale,(float)scale);
-
+		        
+				rect.setColor(Color.argb(25, 255, 0, 0));
+				rect.setStrokeWidth(0);
+				//rect.setStyle(Paint.Style.STROKE);
+				
 				// draw the image
 				canvas.drawBitmap(output,0,0,null);
+				
+				if(rects.size() > 0) {
+					for(int i = 0; i < rects.size(); i++) {			
+				        //text.setColor(bmp.getPixel(rects.get(i).left + 10, 
+				        //		(rects.get(i).bottom + rects.get(i).top) / 2));
+						//text.setColor(Color.RED);
+				        //text.setTextSize((rects.get(i).bottom - rects.get(i).top) * 75 / 100);
+
+				        //rect.setColor(bmp.getPixel(rects.get(i).left, rects.get(i).bottom));
+				        canvas.drawRect(rects.get(i), rect);	
+						//canvas.drawText("Texto!", rects.get(i).left + bmp.getWidth() / 10, 
+						//		(rects.get(i).top + rects.get(i).bottom) / 2, 
+						//		text);
+					}
+				}
 			}
 		}
 	}
@@ -326,7 +310,8 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		@Override
 		public void run() {
-
+			long t1, t2;
+			
 			while( !stopRequested ) {
 
 				// Sleep until it has been told to wake up
@@ -338,22 +323,19 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 				// process the most recently converted image by swapping image buffered
 				synchronized (lockGray) {
-					//ImageUInt8 tmp = gray1;
-					//gray1 = gray2;
-					//gray2 = tmp;
+					t1 = System.currentTimeMillis();
+					highContrastImage = ITBW.changeBitmapContrastBrightness(bmp, 1.4f, 0);
+					edgeImg = TC.generateEdgeImage(highContrastImage, highContrastImage.getWidth(), highContrastImage.getHeight());
 				}
-
-				//if( flipHorizontal )
-					//GImageMiscOps.flipHorizontal(gray2);
-
-				// process the image and compute its gradient
-				//gradient.process(gray2,derivX,derivY);
 
 				// render the output in a synthetic color image
 				synchronized ( lockOutput ) {
-					//VisualizeImageData.colorizeGradient(derivX,derivY,-1,output,storage);
-					output = toGrayscale(bmp);
+					rects = TRD.textRegion(edgeImg);
+					output = bmp;
+					t2 = System.currentTimeMillis();
+					System.out.println("Time edgeImg: " + (t2-t1));
 				}
+				
 				mDraw.postInvalidate();
 			}
 			running = false;

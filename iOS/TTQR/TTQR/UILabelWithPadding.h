@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UILabel (UILabelWithPadding)
+@interface UILabelWithPadding : UILabel
+
+@property (nonatomic, assign) UIEdgeInsets edgeInsets;
 
 @end

@@ -6,8 +6,22 @@
 //  Copyright (c) 2014 tratamientodeimagen. All rights reserved.
 //
 
-#import "UILabel+UILabelWithPadding.h"
+#import "UILabelWithPadding.h"
 
-@implementation UILabel (UILabelWithPadding)
+@implementation UILabelWithPadding
+
+@synthesize edgeInsets;
+
+- (id)initWithFrame:(CGRect)frame{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.edgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    }
+    return self;
+}
+
+- (void)drawTextInRect:(CGRect)rect {
+    [super drawTextInRect:UIEdgeInsetsInsetRect(rect, self.edgeInsets)];
+}
 
 @end

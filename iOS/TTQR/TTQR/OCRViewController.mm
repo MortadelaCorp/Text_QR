@@ -6,54 +6,82 @@
 //  Copyright (c) 2014 tratamientodeimagen. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "OCRViewController.h"
 #import <Accelerate/Accelerate.h>
+#import <MBProgressHUD.h>
 
-@interface ViewController () {
+@interface OCRViewController () {
+    
+    BOOL _isShowingPhoto;
+    NSString *_recognizedText;
+    CGRect originalbuttonViewerRect;
 }
 
 @end
 
-@implementation ViewController
+@implementation OCRViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
+    originalbuttonViewerRect = _buttonViewer.frame;
+    
     _captureSession = nil;
     _tesseract = nil;
+}
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    NSLog(@"OCR view will appear");
     
-    // OCR
+    // Restart OCR reading
+    [self startReadingOCR];
+    _isShowingPhoto = NO;
+}
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    NSLog(@"OCR view did appear");
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    NSLog(@"OCR view will disappear");
     
-    //[self recognizeImageWithTesseract:[UIImage imageNamed:@"image_sample.jpg"]];
-    
-    [self startReadingOCR]; //ESTO lo debe lanzar un botón en realidad
+    // Stop OCR reading
+    [_videoCamera stop];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    NSLog(@"OCR view did disappear");
+}
+
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
 
 -(void)recognizeImageWithTesseract:(UIImage *)img
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-		//[self.activityIndicator startAnimating];
-	});
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    //        [self.activityIndicator startAnimating];
+    //	});
     
     [_tesseract setVariableValue:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:;_'-()%$€#@?¿!¡" forKey:@"tessedit_char_whitelist"]; //limit search
     [_tesseract setImage:img]; //image to check
     [_tesseract recognize];
     
-    NSString *recognizedText = [_tesseract recognizedText];
+    _recognizedText = [_tesseract recognizedText];
     
-    NSLog(@"%@", recognizedText);
+    NSLog(@"%@", _recognizedText);
     
     dispatch_async(dispatch_get_main_queue(), ^{
 		//[self.activityIndicator stopAnimating];
-        
-        _labelStatus.text = recognizedText;
-        
-        //UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Tesseract OCR iOS" message:recognizedText delegate:nil cancelButtonTitle:@"Yeah!" otherButtonTitles:nil];
-        //[alert show];
         
     });
     
@@ -65,12 +93,6 @@
     return YES;  // return YES, if you need to interrupt tesseract before it finishes
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (BOOL)startReadingOCR
 {
     // Instanciamos Tesseract para el OCR
@@ -78,54 +100,17 @@
         _tesseract = [[Tesseract alloc] initWithLanguage:@"eng"];
     
     // Instanciamos openCV para capturar la imagen
-    _videoCamera = [[CvVideoCamera alloc] initWithParentView:_ocrImageView];
-    _videoCamera.delegate = self;
-    
-    _videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack; // Cámara frontal o trasera
-    _videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset352x288; // Tamaño del frame
-    _videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait; // Orientación
-    _videoCamera.defaultFPS = 30; // FPS
-    _videoCamera.grayscaleMode = YES; // Escala de grises
-    _ocrImageView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-
-    
-    [_videoCamera setRotateVideo:YES];
-    [_videoCamera start];
-    return YES;
-}
-
-- (BOOL)startReadingQR
-{
-    NSError *error;
-    
-    AVCaptureDevice *captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    
-    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:captureDevice error:&error];
-    
-    if (!input) {
-        NSLog(@"%@", [error localizedDescription]);
-        return NO;
+    if (!_videoCamera) {
+        _videoCamera = [[CvPhotoCamera alloc] initWithParentView:_ocrImageView];
+        _videoCamera.delegate = self;
+        
+        _videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack; // Cámara frontal o trasera
+        _videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset1280x720; // Tamaño del frame
+        _videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait; // Orientación
+        _videoCamera.defaultFPS = 30; // FPS
     }
     
-    _captureSession = [[AVCaptureSession alloc] init];
-    [_captureSession addInput:input];
-    
-    
-    AVCaptureMetadataOutput *captureMetadataOutput = [[AVCaptureMetadataOutput alloc] init];
-     [_captureSession addOutput:captureMetadataOutput];
-     
-     dispatch_queue_t dispatchQueue;
-     dispatchQueue = dispatch_queue_create("myQueue", NULL);
-     [captureMetadataOutput setMetadataObjectsDelegate:self queue:dispatchQueue];
-     [captureMetadataOutput setMetadataObjectTypes:[NSArray arrayWithObject:AVMetadataObjectTypeQRCode]];
-    
-    _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
-    [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
-    [_videoPreviewLayer setFrame:_viewPreview.layer.bounds];
-    [_viewPreview.layer addSublayer:_videoPreviewLayer];
-    
-    [_captureSession startRunning];
-    
+    [_videoCamera start];
     return YES;
 }
 
@@ -133,93 +118,200 @@
 #ifdef __cplusplus
 - (void)processImage:(Mat &)image
 {
+    
+    NSLog(@"processImage ******************");
+    
     // Creamos una copia de la imagen a procesar
     
+    Mat img = image.clone();
+    
     //Mat image_copy;
-    //cvtColor(image, image_copy, CV_GRAY2BGR); // Para cambiar de espacio de color
-    Mat new_image = Mat::zeros(image.size(), image.type());
-    
-    
-    // La tratamos
+    cvtColor(image, img, CV_BGR2GRAY); // Para cambiar de espacio de color a grises
+    //Mat new_image = Mat::zeros(image.size(), image.type());
     
     
     // Subimos contraste y brillo
-    /*double contrast = 2.0;
+    double contrast = 2.0;
     int brightness = 30;
     
-    for (int i = 0; i < image.rows; i++) {
-        for (int j = 0; j < image.cols; j++) {
-         
-            image.at<uchar>(i, j) = saturate_cast<uchar>(contrast*(image.at<uchar>(i, j))+brightness);
+    for (int i = 0; i < img.rows; i++) {
+        for (int j = 0; j < img.cols; j++) {
+            
+            img.at<uchar>(i, j) = saturate_cast<uchar>(contrast*(img.at<uchar>(i, j))+brightness);
         }
     }
-     */
-    
     
     // transformamos las zonas de texto en "blobs"
     // Para ello -> cvMorphologyEx -> cvThreshold (blanco y negro) -> cvSmooth (difuminar) -> cvDilate (formar el blob final)
-    Mat img = image;
+    //Mat img = image;
     
-    Mat img_temp = Mat::zeros(image.size(), image.type());
-
-    cv::morphologyEx(img, img, CV_MOP_TOPHAT, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(21, 3)));
+    //Mat img_temp = Mat::zeros(image.size(), image.type());
+    
+    cv::morphologyEx(img, img, CV_MOP_TOPHAT, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
     //cvMorphologyEx(&img, &img, &img_temp, cvCreateStructuringElementEx(21, 3, 10, 2, CV_SHAPE_RECT, NULL), CV_MOP_TOPHAT, 1);
     cv::threshold(img, img, 100, 255, CV_THRESH_BINARY);
     
     cv::GaussianBlur(img, img, cv::Size(5,5), cv::BORDER_CONSTANT); //cvSmooth();
     
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(21, 3)));
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(21, 3)));
+    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
+    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
+    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
+    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
+    
     
     // Detectamos bordes
-    //cvCanny(&tmp, &tmp, 50.0, 300.0);
-    cv::Canny(img, img, 50.0, 300.0);
+    cv::Canny(img, img, 45.0, 50.0);
     
-    Mat copy = img.clone();
+    // DEBUG: PARA VER EL PROCESAMIENTO. Comentar después
+    //image = img.clone();
+    
+    
+    //Mat copy = img.clone();
     
     std::vector<std::vector<cv::Point> > contours;
-    cv::findContours(copy, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); // Pasamos una copia de la imagen porque la sobreescribe
-
+    
+    cv::findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); // Pasamos una copia de la imagen porque la sobreescribe
+    //NSLog(@"size %lu", contours.size());
+    
     // iteramos por los contornos
-    // NOS HEMOS QUEDADO POR AQUIIIII -> Mirar morourl
-    
-    
-    // Y se la pasamos al Tesseract
-    
-    //if((int)CACurrentMediaTime()%3==0) // Cada 3 segundos reconoce una imagen
-    //[self recognizeImageWithTesseract:[ViewController UIImageFromCVMat:image]];
-    
-    
-    // Finalmente, volcamos la copia sobre la original para verla en el preview
-    
-    //cvtColor(image_copy, image, CV_GRAY2BGRA);
-    //image = new_image;
+    for(int i = 0; i < contours.size(); i++) {
+        //NSLog(@"Size contours[%i] = %lu", i, contours[i].size());
+        
+        if (contours[i].size() >= 50) {
+            cv::Rect rectangle = cv::boundingRect(contours[i]);//findRectangleContaining(contours[i]);
+            
+            if (rectangle.width > 40 && rectangle.height > 20) {
+                cv::Point pt1, pt2;
+                pt1.x = rectangle.x;
+                pt1.y = rectangle.y;
+                pt2.x = rectangle.x + rectangle.width;
+                pt2.y = rectangle.y + rectangle.height;
+                cv::rectangle(image, pt1, pt2, CV_RGB(0, 255, 0), 4);
+            }
+        }
+    }
+    // Posteriormente se la pasamos al tesseract (en la acción del botón)
 }
+
 #endif
+
+// OpenCV photoCameraDelegates
+- (void)photoCamera:(CvPhotoCamera *)photoCamera capturedImage:(UIImage *)image
+{
+    NSLog(@"PHOTO CAMERA DELEGATE");
+    
+    // Paramos la cámara
+    [_videoCamera stop];
+    
+    // Pasamos la imagen a Mat, que es el formato con el que trabaja OpenCV
+    Mat img = [self cvMatFromUIImage:image];
+    
+    // Rectificamos el giro para que esté vertical
+    rotate(img, -90, img);
+    
+    _ocrImageView.image = [self UIImageFromCVMat:img]; // Preview
+    
+    // Procesamos la imagen
+    [self processImage:img];
+    
+    UIImage *imagenCapturada = [self UIImageFromCVMat:img]; // Imagen ya procesada
+    
+    // Mostramos la imagen procesada
+    _ocrResultImageView.image = imagenCapturada;
+    _ocrResultImageView.hidden = NO;
+    //_ocrResultImageView.alpha = 0.5;
+}
+
+- (void)photoCameraCancel:(CvPhotoCamera *)photoCamera
+{
+    NSLog(@"CANCEL PHOTO CAMERA");
+}
 
 // OCR delegate
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-
+    
 }
 
-// QR delegate
-- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
-    if (metadataObjects != nil && [metadataObjects count] > 0) {
-        AVMetadataMachineReadableCodeObject *metadataObj = [metadataObjects objectAtIndex:0];
-        if ([[metadataObj type] isEqualToString:AVMetadataObjectTypeQRCode]) {
-            [_labelStatus performSelectorOnMainThread:@selector(setText:) withObject:[metadataObj stringValue] waitUntilDone:NO];
-            
-            //[self performSelectorOnMainThread:@selector(stopReading) withObject:nil waitUntilDone:NO];
-            //[_bbitemStart performSelectorOnMainThread:@selector(setTitle:) withObject:@"Start!" waitUntilDone:NO];
-            NSLog(@"x: %f, y: %f, width: %f, height: %f", metadataObj.bounds.origin.x, metadataObj.bounds.origin.y, metadataObj.bounds.size.width, metadataObj.bounds.size.height);
-        }
+- (IBAction)touchScreen:(id)sender {
+    
+    if (_isShowingPhoto) {
+        _isShowingPhoto = NO;
+        _ocrResultImageView.hidden = YES;
+        [_videoCamera start];
+    }
+    else {
+        NSLog(@"Tomamos una foto");
+        _isShowingPhoto = YES;
+        
+        [_videoCamera takePicture];
 
+        [UIView animateWithDuration: 0.5
+                              delay: 0.0
+                            options: UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+                             _buttonViewer.frame = originalbuttonViewerRect;
+                             _buttonViewer.alpha = 1.0;
+                         }
+                         completion:nil];
     }
 }
 
-// Sirve para pasar del formato que devuelve openCV (cv::Mat) a UIImage. Sacado de una web china D:
-+(UIImage *)UIImageFromCVMat:(cv::Mat)cvMat
+// Para pasar datos de esta vista a la vista modal al pulsar el boton de Abrir QR
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"viewer"]) {
+        
+        // Mostramos un spinner mientras carga
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+
+        // Y se la pasamos al Tesseract
+        [self recognizeImageWithTesseract:_ocrResultImageView.image];
+        
+        // Ocultar el spinner
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+
+        // Abrimos un visor en una vista modal
+        ViewerViewController *viewerViewController = segue.destinationViewController;
+        viewerViewController.receivedData = _recognizedText;
+        viewerViewController.receivedDataType = TEXT;
+        _isShowingPhoto = NO;
+        
+        [UIView animateWithDuration: 0.5
+                              delay: 0.0
+                            options: UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+                             _buttonViewer.frame = CGRectMake(_buttonViewer.frame.origin.x, _buttonViewer.frame.origin.y + _buttonViewer.frame.size.height, _buttonViewer.frame.size.width, _buttonViewer.frame.size.height);
+                             _buttonViewer.alpha = 0.0;
+                         }
+                         completion:nil];
+    }
+}
+
+// Métodos auxiliares de OpenCV para convertir entre UIImage y cv::Mat
+- (cv::Mat)cvMatFromUIImage:(UIImage *)image
+{
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(image.CGImage);
+    CGFloat cols = image.size.width;
+    CGFloat rows = image.size.height;
+    
+    cv::Mat cvMat(rows, cols, CV_8UC4); // 8 bits per component, 4 channels (color channels + alpha)
+    
+    CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to  data
+                                                    cols,                       // Width of bitmap
+                                                    rows,                       // Height of bitmap
+                                                    8,                          // Bits per component
+                                                    cvMat.step[0],              // Bytes per row
+                                                    colorSpace,                 // Colorspace
+                                                    kCGImageAlphaNoneSkipLast |
+                                                    kCGBitmapByteOrderDefault); // Bitmap info flags
+    
+    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
+    CGContextRelease(contextRef);
+    
+    return cvMat;
+}
+
+-(UIImage *)UIImageFromCVMat:(cv::Mat)cvMat
 {
     NSData *data = [NSData dataWithBytes:cvMat.data length:cvMat.elemSize()*cvMat.total()];
     CGColorSpaceRef colorSpace;
@@ -231,8 +323,7 @@
     }
     
     CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
-    bool alpha = cvMat.channels() == 4;
-    CGBitmapInfo bitMapInfo = (alpha ? kCGImageAlphaLast : kCGImageAlphaNone) | kCGBitmapByteOrderDefault;
+    
     // Creating CGImage from cv::Mat
     CGImageRef imageRef = CGImageCreate(cvMat.cols,                                 //width
                                         cvMat.rows,                                 //height
@@ -240,7 +331,7 @@
                                         8 * cvMat.elemSize(),                       //bits per pixel
                                         cvMat.step[0],                            //bytesPerRow
                                         colorSpace,                                 //colorspace
-                                        bitMapInfo,                                 // bitmap info
+                                        kCGImageAlphaNone|kCGBitmapByteOrderDefault,// bitmap info
                                         provider,                                   //CGDataProviderRef
                                         NULL,                                       //decode
                                         false,                                      //should interpolate
@@ -257,68 +348,14 @@
     return finalImage;
 }
 
-@end
-
-// Category de UIImage para pasar a grayscale
-
-@implementation UIImage (grayscale)
-
-typedef enum {
-    ALPHA = 0,
-    BLUE = 1,
-    GREEN = 2,
-    RED = 3
-} PIXELS;
-
-- (UIImage *)convertToGrayscale {
-    CGSize size = [self size];
-    int width = size.width;
-    int height = size.height;
+// Para girar un mat
+void rotate(cv::Mat& src, double angle, cv::Mat& dst)
+{
+    int len = std::max(src.cols, src.rows);
+    cv::Point2f pt(len/2., len/2.);
+    cv::Mat r = cv::getRotationMatrix2D(pt, angle, 1.0);
     
-    // the pixels will be painted to this array
-    uint32_t *pixels = (uint32_t *) malloc(width * height * sizeof(uint32_t));
-    
-    // clear the pixels so any transparency is preserved
-    memset(pixels, 0, width * height * sizeof(uint32_t));
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    // create a context with RGBA pixels
-    CGContextRef context = CGBitmapContextCreate(pixels, width, height, 8, width * sizeof(uint32_t), colorSpace,
-                                                 kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
-    
-    // paint the bitmap to our context which will fill in the pixels array
-    CGContextDrawImage(context, CGRectMake(0, 0, width, height), [self CGImage]);
-    
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
-            uint8_t *rgbaPixel = (uint8_t *) &pixels[y * width + x];
-            
-            // convert to grayscale using recommended method: http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
-            uint32_t gray = 0.3 * rgbaPixel[RED] + 0.59 * rgbaPixel[GREEN] + 0.11 * rgbaPixel[BLUE];
-            
-            // set the pixels to gray
-            rgbaPixel[RED] = gray;
-            rgbaPixel[GREEN] = gray;
-            rgbaPixel[BLUE] = gray;
-        }
-    }
-    
-    // create a new CGImageRef from our context with the modified pixels
-    CGImageRef image = CGBitmapContextCreateImage(context);
-    
-    // we're done with the context, color space, and pixels
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    free(pixels);
-    
-    // make a new UIImage to return
-    UIImage *resultUIImage = [UIImage imageWithCGImage:image];
-    
-    // we're done with image now too
-    CGImageRelease(image);
-    
-    return resultUIImage;
+    cv::warpAffine(src, dst, r, cv::Size(src.rows, src.cols));
 }
 
 @end

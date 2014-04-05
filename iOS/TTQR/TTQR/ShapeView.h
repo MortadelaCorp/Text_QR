@@ -10,4 +10,6 @@
 
 @interface ShapeView : UIView
 
+@property (nonatomic, strong) NSArray *corners;
+
 @end

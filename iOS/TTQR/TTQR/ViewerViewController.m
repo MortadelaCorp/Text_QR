@@ -8,8 +8,9 @@
 
 #import "ViewerViewController.h"
 
-@interface ViewerViewController ()
-
+@interface ViewerViewController () {
+    UIColor *originalTintColor;
+}
 @end
 
 @implementation ViewerViewController
@@ -27,6 +28,41 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    originalTintColor = _reloadButton.tintColor;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    switch (self.receivedDataType) {
+        case URL:
+        {
+            _reloadButton.enabled = YES;
+            _reloadButton.tintColor = originalTintColor;
+            
+            _urlLabel.hidden = NO;
+            _webview.hidden = NO;
+            _textview.hidden = YES;
+            
+            _urlLabel.text = _receivedData;
+            NSURL *URL = [NSURL URLWithString:_receivedData];
+            NSURLRequest *requestObj = [NSURLRequest requestWithURL:URL];
+            [self.webview loadRequest:requestObj];
+
+            break;
+        }
+        case TEXT:
+            _reloadButton.enabled = NO;
+            _reloadButton.tintColor = [UIColor clearColor];
+            _urlLabel.hidden = YES;
+            _webview.hidden = YES;
+            _textview.hidden = NO;
+            
+            _textview.text = _receivedData;
+            _textview.font = [UIFont fontWithName:@"Helvetica" size:22];
+            
+            break;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -46,4 +82,11 @@
 }
 */
 
+- (IBAction)reloadWeb:(id)sender {
+    [self.webview reload];
+}
+
+- (IBAction)dismissView:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 @end

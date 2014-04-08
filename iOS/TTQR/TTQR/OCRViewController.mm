@@ -14,19 +14,24 @@
     
     BOOL _isShowingPhoto;
     NSString *_recognizedText;
-    CGRect originalbuttonViewerRect;
+    CGRect _originalbuttonViewerRect;
+    UIImage *_imageForTesseract;
 }
 
 @end
 
 @implementation OCRViewController
 
+#pragma mark -
+
+#pragma mark ViewController delegates:
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    originalbuttonViewerRect = _buttonViewer.frame;
+    _originalbuttonViewerRect = _buttonViewer.frame;
     
     _captureSession = nil;
     _tesseract = nil;
@@ -39,6 +44,7 @@
     // Restart OCR reading
     [self startReadingOCR];
     _isShowingPhoto = NO;
+    _ocrResultImageView.hidden = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -51,7 +57,7 @@
     NSLog(@"OCR view will disappear");
     
     // Stop OCR reading
-    [_videoCamera stop];
+    [_opencvPhotoCamera stop];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -66,216 +72,55 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void)recognizeImageWithTesseract:(UIImage *)img
-{
-    //    dispatch_async(dispatch_get_main_queue(), ^{
-    //        [self.activityIndicator startAnimating];
-    //	});
-    
-    [_tesseract setVariableValue:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:;_'-()%$€#@?¿!¡" forKey:@"tessedit_char_whitelist"]; //limit search
-    [_tesseract setImage:img]; //image to check
-    [_tesseract recognize];
-    
-    _recognizedText = [_tesseract recognizedText];
-    
-    NSLog(@"%@", _recognizedText);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-		//[self.activityIndicator stopAnimating];
-        
-    });
-    
-    //tesseract = nil; //deallocate and free all memory
-}
+#pragma mark -
 
-- (BOOL)shouldCancelImageRecognitionForTesseract:(Tesseract*)tesseract {
-    NSLog(@"progress: %d", tesseract.progress);
-    return YES;  // return YES, if you need to interrupt tesseract before it finishes
-}
-
-- (BOOL)startReadingOCR
-{
-    // Instanciamos Tesseract para el OCR
-    if (!_tesseract)
-        _tesseract = [[Tesseract alloc] initWithLanguage:@"eng"];
-    
-    // Instanciamos openCV para capturar la imagen
-    if (!_videoCamera) {
-        _videoCamera = [[CvPhotoCamera alloc] initWithParentView:_ocrImageView];
-        _videoCamera.delegate = self;
-        
-        _videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack; // Cámara frontal o trasera
-        _videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset1280x720; // Tamaño del frame
-        _videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait; // Orientación
-        _videoCamera.defaultFPS = 30; // FPS
-    }
-    
-    [_videoCamera start];
-    return YES;
-}
-
-// OCR opencv
-#ifdef __cplusplus
-- (void)processImage:(Mat &)image
-{
-    
-    NSLog(@"processImage ******************");
-    
-    // Creamos una copia de la imagen a procesar
-    
-    Mat img = image.clone();
-    
-    //Mat image_copy;
-    cvtColor(image, img, CV_BGR2GRAY); // Para cambiar de espacio de color a grises
-    //Mat new_image = Mat::zeros(image.size(), image.type());
-    
-    
-    // Subimos contraste y brillo
-    double contrast = 2.0;
-    int brightness = 30;
-    
-    for (int i = 0; i < img.rows; i++) {
-        for (int j = 0; j < img.cols; j++) {
-            
-            img.at<uchar>(i, j) = saturate_cast<uchar>(contrast*(img.at<uchar>(i, j))+brightness);
-        }
-    }
-    
-    // transformamos las zonas de texto en "blobs"
-    // Para ello -> cvMorphologyEx -> cvThreshold (blanco y negro) -> cvSmooth (difuminar) -> cvDilate (formar el blob final)
-    //Mat img = image;
-    
-    //Mat img_temp = Mat::zeros(image.size(), image.type());
-    
-    cv::morphologyEx(img, img, CV_MOP_TOPHAT, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
-    //cvMorphologyEx(&img, &img, &img_temp, cvCreateStructuringElementEx(21, 3, 10, 2, CV_SHAPE_RECT, NULL), CV_MOP_TOPHAT, 1);
-    cv::threshold(img, img, 100, 255, CV_THRESH_BINARY);
-    
-    cv::GaussianBlur(img, img, cv::Size(5,5), cv::BORDER_CONSTANT); //cvSmooth();
-    
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
-    cv::dilate(img, img, cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7)));
-    
-    
-    // Detectamos bordes
-    cv::Canny(img, img, 45.0, 50.0);
-    
-    // DEBUG: PARA VER EL PROCESAMIENTO. Comentar después
-    //image = img.clone();
-    
-    
-    //Mat copy = img.clone();
-    
-    std::vector<std::vector<cv::Point> > contours;
-    
-    cv::findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); // Pasamos una copia de la imagen porque la sobreescribe
-    //NSLog(@"size %lu", contours.size());
-    
-    // iteramos por los contornos
-    for(int i = 0; i < contours.size(); i++) {
-        //NSLog(@"Size contours[%i] = %lu", i, contours[i].size());
-        
-        if (contours[i].size() >= 50) {
-            cv::Rect rectangle = cv::boundingRect(contours[i]);//findRectangleContaining(contours[i]);
-            
-            if (rectangle.width > 40 && rectangle.height > 20) {
-                cv::Point pt1, pt2;
-                pt1.x = rectangle.x;
-                pt1.y = rectangle.y;
-                pt2.x = rectangle.x + rectangle.width;
-                pt2.y = rectangle.y + rectangle.height;
-                cv::rectangle(image, pt1, pt2, CV_RGB(0, 255, 0), 4);
-            }
-        }
-    }
-    // Posteriormente se la pasamos al tesseract (en la acción del botón)
-}
-
-#endif
-
-// OpenCV photoCameraDelegates
-- (void)photoCamera:(CvPhotoCamera *)photoCamera capturedImage:(UIImage *)image
-{
-    NSLog(@"PHOTO CAMERA DELEGATE");
-    
-    // Paramos la cámara
-    [_videoCamera stop];
-    
-    // Pasamos la imagen a Mat, que es el formato con el que trabaja OpenCV
-    Mat img = [self cvMatFromUIImage:image];
-    
-    // Rectificamos el giro para que esté vertical
-    rotate(img, -90, img);
-    
-    _ocrImageView.image = [self UIImageFromCVMat:img]; // Preview
-    
-    // Procesamos la imagen
-    [self processImage:img];
-    
-    UIImage *imagenCapturada = [self UIImageFromCVMat:img]; // Imagen ya procesada
-    
-    // Mostramos la imagen procesada
-    _ocrResultImageView.image = imagenCapturada;
-    _ocrResultImageView.hidden = NO;
-    //_ocrResultImageView.alpha = 0.5;
-}
-
-- (void)photoCameraCancel:(CvPhotoCamera *)photoCamera
-{
-    NSLog(@"CANCEL PHOTO CAMERA");
-}
-
-// OCR delegate
-- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
-{
-    
-}
+#pragma mark IBActions:
 
 - (IBAction)touchScreen:(id)sender {
     
+    // Al tocar la pantalla...
+    // Si estaba mostrando la foto anterior, la descartamos y reiniciamos la cámara
     if (_isShowingPhoto) {
         _isShowingPhoto = NO;
         _ocrResultImageView.hidden = YES;
-        [_videoCamera start];
+        [_opencvPhotoCamera start];
     }
+    // Si ya estaba en modo cámara, tomamos una foto
     else {
-        NSLog(@"Tomamos una foto");
         _isShowingPhoto = YES;
         
-        [_videoCamera takePicture];
-
-        [UIView animateWithDuration: 0.5
-                              delay: 0.0
-                            options: UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             _buttonViewer.frame = originalbuttonViewerRect;
-                             _buttonViewer.alpha = 1.0;
-                         }
-                         completion:nil];
+        [_opencvPhotoCamera takePicture]; // Esto llama al delegate photoCamera:capturedImage
     }
 }
 
-// Para pasar datos de esta vista a la vista modal al pulsar el boton de Abrir QR
+// Para pasar datos de esta vista a la vista modal al pulsar el boton de Ver Texto Reconocido
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"viewer"]) {
         
-        // Mostramos un spinner mientras carga
-        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-
-        // Y se la pasamos al Tesseract
-        [self recognizeImageWithTesseract:_ocrResultImageView.image];
-        
-        // Ocultar el spinner
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-
         // Abrimos un visor en una vista modal
         ViewerViewController *viewerViewController = segue.destinationViewController;
         viewerViewController.receivedData = _recognizedText;
         viewerViewController.receivedDataType = TEXT;
         _isShowingPhoto = NO;
         
+        
+        // Mostramos un spinner mientras pasamos el Tesseract, que tarda bastante
+        [MBProgressHUD showHUDAddedTo:viewerViewController.view animated:YES];
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+            
+            // Pasamos el Tesseract
+            [self recognizeImageWithTesseract:_imageForTesseract];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                viewerViewController.receivedData = _recognizedText;
+                [viewerViewController viewWillAppear:NO];
+                _recognizedText = @"";
+                [MBProgressHUD hideHUDForView:viewerViewController.view animated:YES];
+            });
+        });
+        
+        
+        // Ocultamos el botón del visor de texto reconocido
         [UIView animateWithDuration: 0.5
                               delay: 0.0
                             options: UIViewAnimationOptionCurveEaseOut
@@ -286,6 +131,172 @@
                          completion:nil];
     }
 }
+
+#pragma mark -
+
+#pragma mark Tesseract:
+
+// Tesseract
+- (BOOL)startReadingOCR
+{
+    // Instanciamos Tesseract para el OCR
+    if (!_tesseract)
+        _tesseract = [[Tesseract alloc] initWithLanguage:@"eng"];
+    
+    // Instanciamos openCV para capturar la imagen
+    if (!_opencvPhotoCamera) {
+        _opencvPhotoCamera = [[CvPhotoCamera alloc] initWithParentView:_ocrImageView];
+        _opencvPhotoCamera.delegate = self;
+        
+        _opencvPhotoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack; // Cámara frontal o trasera
+        _opencvPhotoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480; // Tamaño del frame
+        _opencvPhotoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait; // Orientación
+        _opencvPhotoCamera.defaultFPS = 30; // FPS
+    }
+    
+    [_opencvPhotoCamera start];
+    return YES;
+}
+
+-(void)recognizeImageWithTesseract:(UIImage *)img
+{
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//          [self.activityIndicator startAnimating];
+//    });
+    
+    [_tesseract setVariableValue:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()@?!" forKey:@"tessedit_char_whitelist"]; //limit search
+    [_tesseract setImage:img]; //image to check
+    [_tesseract recognize];
+    
+    _recognizedText = [_tesseract recognizedText];
+    
+    NSLog(@"%@", _recognizedText);
+    
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self.activityIndicator stopAnimating];
+//        
+//    });
+    
+    //tesseract = nil; //deallocate and free all memory
+}
+
+- (BOOL)shouldCancelImageRecognitionForTesseract:(Tesseract*)tesseract {
+    NSLog(@"progress: %d", tesseract.progress);
+    return YES;  // return YES, if you need to interrupt tesseract before it finishes
+}
+
+#pragma mark -
+
+#pragma mark OpenCV:
+
+// OpenCV
+#ifdef __cplusplus
+- (void)processImage:(Mat &)image imageForTesseract:(Mat &)imageForTesseract
+{
+    
+    // Este tratamiento de la imagen es para detectar dónde está el texto, no para mejorar su reconocimiento OCR posterior
+    NSLog(@"*** [OpenCV - ProcessImage:]");
+    
+    // Creamos una copia de la imagen a procesar
+    Mat img = image.clone();
+    cvtColor(image, img, CV_BGR2GRAY); // Para cambiar de espacio de color a grises
+    
+    // Subimos contraste y brillo
+    double contrast = 2.0;
+    int brightness = 30;
+    
+    for (int i = 0; i < img.rows; i++)
+        for (int j = 0; j < img.cols; j++)
+            img.at<uchar>(i, j) = saturate_cast<uchar>(contrast*(img.at<uchar>(i, j))+brightness);
+    
+    // Si es para Tesseract, el resto de procesamientos no sirven, así que sólo clonamos hasta aquí
+    imageForTesseract = img.clone();
+    
+    // transformamos las zonas de texto en "blobs"
+    Mat blobShape = cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(30, 7));
+    int dilateLevel = 4;
+    cv::morphologyEx(img, img, CV_MOP_TOPHAT, blobShape);
+    cv::threshold(img, img, 100, 200, CV_THRESH_BINARY);
+    cv::GaussianBlur(img, img, cv::Size(5,5), cv::BORDER_CONSTANT);
+    
+    for (int k = 0; k < dilateLevel; k++)
+        cv::dilate(img, img, blobShape);
+    
+    
+    // Detectamos bordes
+    cv::Canny(img, img, 45.0, 50.0);
+    
+    std::vector<std::vector<cv::Point> > contours;
+    
+    cv::findContours(img, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE); // Pasamos una copia de la imagen porque la sobreescribe
+    
+    // iteramos por los contornos
+    for(int i = 0; i < contours.size(); i++) {
+        
+        if (contours[i].size() >= 50) {
+            cv::Rect rectangle = cv::boundingRect(contours[i]);
+            
+            if (rectangle.width > 40 && rectangle.height > 20) {
+                cv::Point pt1, pt2;
+                pt1.x = rectangle.x;
+                pt1.y = rectangle.y;
+                pt2.x = rectangle.x + rectangle.width;
+                pt2.y = rectangle.y + rectangle.height;
+                cv::rectangle(image, pt1, pt2, CV_RGB(0, 255, 0), 4); // Para ver los rectángulos sobre la imagen
+            }
+        }
+    }
+}
+
+#endif
+
+// OpenCV photoCameraDelegates
+- (void)photoCamera:(CvPhotoCamera *)photoCamera capturedImage:(UIImage *)image
+{
+    NSLog(@"PHOTO CAMERA DELEGATE");
+    
+    // Paramos la cámara
+    [_opencvPhotoCamera stop];
+    
+    // Pasamos la imagen a Mat, que es el formato con el que trabaja OpenCV
+    Mat img = [self cvMatFromUIImage:image];
+    
+    // Rectificamos el giro para que esté vertical
+    rotate(img, -90, img);
+    
+    // Ponemos una preview de la foto
+    _ocrImageView.image = _imageForTesseract;
+
+    // Variable para el output para Tesseract:
+    Mat imageForTesseract;
+    
+    // Procesamos la imagen para detectar texto (como resultado debe renderizar rectángulos encima del texto)
+    [self processImage:img imageForTesseract:imageForTesseract];
+
+    // Guardamos la imagen para Tesseract ya convertida a UIImage
+    _imageForTesseract = [self UIImageFromCVMat:imageForTesseract];
+
+    // Mostramos el botón inferior del visor de texto
+    [UIView animateWithDuration: 0.5
+                          delay: 0.0
+                        options: UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         _buttonViewer.frame = _originalbuttonViewerRect;
+                         _buttonViewer.alpha = 1.0;
+                     }
+                     completion:nil];
+    
+    // Mostramos la imagen procesada
+    _ocrResultImageView.image = [self UIImageFromCVMat:img];
+    _ocrResultImageView.hidden = NO;
+}
+
+- (void)photoCameraCancel:(CvPhotoCamera *)photoCamera
+{
+    NSLog(@"CANCEL PHOTO CAMERA");
+}
+
+#pragma mark Compatibility OpenCV-Foundation:
 
 // Métodos auxiliares de OpenCV para convertir entre UIImage y cv::Mat
 - (cv::Mat)cvMatFromUIImage:(UIImage *)image

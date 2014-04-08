@@ -14,7 +14,7 @@
 
 using namespace cv;
 
-@interface OCRViewController : UIViewController < AVCaptureVideoDataOutputSampleBufferDelegate, CvPhotoCameraDelegate, TesseractDelegate> {
+@interface OCRViewController : UIViewController <CvPhotoCameraDelegate, TesseractDelegate> {
     
 }
 
@@ -26,9 +26,8 @@ using namespace cv;
 
 @property (nonatomic, strong) AVCaptureSession *captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
-//@property (nonatomic, strong) AVCaptureVideoDataOutput *videoDataOutput;
 
-@property (nonatomic, strong) CvPhotoCamera *videoCamera;
+@property (nonatomic, strong) CvPhotoCamera *opencvPhotoCamera;
 
 @property (nonatomic, strong) Tesseract *tesseract;
 
